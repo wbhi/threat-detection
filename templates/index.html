@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cyberbullying Detection</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+    }
+    .container {
+      max-width: 800px;
+      margin-top: 60px;
+    }
+    .navbar-brand span {
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+    .static-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #343a40;
+      margin-bottom: 30px;
+      text-align:center;
+    }
+    .form-control {
+      height: 160px;
+      border-radius: 10px;
+      border: 1.5px solid #6c757d;
+      font-size: 1.1rem;
+    }
+    .btn {
+      font-size: 1.1rem;
+      border-radius: 8px;
+    }
+    .result {
+      text-align: center;
+      font-size: 24px;
+      margin-top: 25px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      color: #fff;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    .bullying {
+      background-color: #dc3545;
+    }
+    .non-bullying {
+      background-color: #28a745;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+    @keyframes slideInUp {
+      from {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .modal.fade.slide-in .modal-dialog {
+      animation: slideInUp 0.4s ease-out;
+    }
+    #loadingSpinner {
+      display: none;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="{{ url_for('static', filename='cyber_logo.png') }}" alt="Cyber Security Logo" style="height: 40px; margin-right: 10px;">
+      <span><b>Threat Detector</b></span>
+    </a>
+<div class="ml-auto d-flex align-items-center">
+  <a href="/" class="btn btn-outline-light mr-2">Home</a>
+  <a href="/about" class="btn btn-outline-light">About</a>
+  <a href="/alerts" class="btn btn-outline-light ml-2">View Alerts</a>
+  {% if username %}
+    <a href="/logout" class="btn btn-danger ml-2">Logout</a>
+  {% endif %}
+</div>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+
+  <div class="container">
+    <div class="static-title">Threat Detection Tool</div>
+<style>
+  .fade-in-badge {
+    animation: fadeInUp 0.7s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="text-center mb-4 fade-in-badge">
+  <span class="badge badge-pill badge-info px-4 py-3 shadow-sm" style="font-size: 1.1rem;">
+    👤 Logged in as, <strong>{{ username }}</strong>
+  </span>
+</div>
+
+
+    <form method="POST" action="/index" onsubmit="showSpinner()">
+      <div class="form-group">
+        <label for="textInput" class="font-weight-bold"></label>
+        <div class="d-flex">
+          <textarea name="text" id="textInput" class="form-control mr-2" placeholder="E.g., Type a comment....">{{ user_input }}</textarea>
+
+          <button type="button" class="btn btn-secondary" onclick="startListening()" title="Speak">
+            🎤
+          </button>
+        </div>
+      </div>
+
+      <div id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block mt-2">Analyze Text</button>
+    </form>
+
+    {% if prediction is not none %}
+      <div class="result {% if prediction == 1 %}bullying{% else %}non-bullying{% endif %}">
+        {% if prediction == 1 %}
+          🚨 Threat Detected
+        {% else %}
+          ✅ No Threat Detected
+        {% endif %}
+      </div>
+
+      <script>
+        const message = "{{ 'Threat detected' if prediction == 1 else 'No Threat Detected' }}";
+        const speech = new SpeechSynthesisUtterance(message);
+        speechSynthesis.speak(speech);
+      </script>
+    {% endif %}
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="/upload" class="btn btn-outline-primary">
+      📂 Upload File to Extract Text
+    </a>
+  </div>
+
+  <footer>
+    Made by Abhirama
+  </footer>
+  
+  <div class="text-center mt-4">
+    <button class="btn btn-danger" data-toggle="modal" data-target="#helpModal">
+      🚨 Need Help?
+    </button>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function startListening() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = function(event) {
+        const spokenText = event.results[0][0].transcript;
+        document.getElementById("textInput").value = spokenText;
+      };
+
+      recognition.onerror = function(event) {
+        alert('Speech Recognition Error: ' + event.error);
+      };
+
+      recognition.start();
+    }
+
+    function showSpinner() {
+      document.getElementById('loadingSpinner').style.display = 'block';
+    }
+  </script>
+
+  <!-- Help Modal -->
+  <div class="modal fade slide-in" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-danger">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="helpModalLabel">🚨 Emergency Help</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p><strong>If you or someone you know is in immediate danger, contact an emergency service below:</strong></p>
+          <ul>
+            <li>📞 <strong>Child Helpline (India):</strong> 1098</li>
+            <li>📞 <strong>Emergency (Police):</strong> 100</li>
+            <li>📞 <strong>Cyber Crime Helpline:</strong> 1930 or visit <a href="https://cybercrime.gov.in" target="_blank">cybercrime.gov.in</a></li>
+          </ul>
+          <hr>
+          <p>This tool is here to help detect cyberbullying. You can:</p>
+          <ul>
+            <li>Type or speak a comment in the box above.</li>
+            <li>Click "Analyze Text" to check for harmful language.</li>
+          </ul>
+          <p><em>Stay safe. You’re not alone.</em></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

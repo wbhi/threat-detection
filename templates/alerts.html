@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flagged Threats</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="p-4">
+  <div class="container">
+    <h2 class="mb-4">🚨 Flagged Messages</h2>
+
+    {% if alerts %}
+      <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in alerts %}
+            <tr>
+              <td>{{ entry.time }}</td>
+              <td>{{ entry.user }}</td>
+              <td>{{ entry.message }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No threats flagged yet.</p>
+    {% endif %}
+
+    <a href="/index" class="btn btn-secondary mt-3">⬅ Back</a>
+  </div>
+</body>
+</html>

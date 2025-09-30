@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>InnoGuard – Results Dashboard</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      padding: 2rem;
+      background-color: #f4f6f8;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .card {
+      margin: 2rem auto;
+      max-width: 800px;
+    }
+    .highlight {
+      background-color: yellow;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="card-header bg-dark text-white">
+      Cyberbullying Detection Result
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">Input Comment:</h5>
+      <p>{{ user_input }}</p>
+
+      <h5 class="card-title">Prediction:</h5>
+      <p>
+        {% if prediction == 1 %}
+          <span class="text-danger">🚨 Bullying</span>
+        {% else %}
+          <span class="text-success">✅ Non-Bullying</span>
+        {% endif %}
+      </p>
+
+      <h5 class="card-title">Confidence:</h5>
+      <p>{{ confidence }}</p>
+
+      {% if explanation_html %}
+      <h5 class="card-title">Why this result?</h5>
+      <div class="border p-3 rounded bg-white">
+        {{ explanation_html | safe }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</body>
+</html>
